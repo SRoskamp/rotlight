@@ -18,7 +18,7 @@ int mode = M_HWIDTH;
 int encval[6] = {0,NUM_LEDS/2,31,31,31};
 
 // Maximum and minimum values for each mode
-const int maxval[6] = {(NUM_LEDS/2) + 1, NUM_LEDS, 31, 31, 31};
+const int maxval[6] = {(NUM_LEDS/2) + 1, NUM_LEDS - 1, 31, 31, 31};
 const int minval[6] = {0, 0, 0, 0, 0};
 
 // Create encoder object
