@@ -1,7 +1,7 @@
 #include <Encoder.h>
 #include <FastLED.h>
 
-#define NUM_LEDS_PER_ROW 8
+#define NUM_LEDS_PER_ROW 4
 #define NUM_ROWS 2
 #define M_BUTTON_PIN 5
 #define D_PIN 6
@@ -15,7 +15,7 @@ int mode = M_VAL;
 // Save current encoder value (current setting) for every mode
 // Start with white and a 2-wide block
 // width, hue, saturation, value
-int encval[5] = {2, 0, 0, 0x0F};
+int encval[5] = {2, 0, 0, 0x40};
 
 // Maximum and minimum values for each mode
 const int maxval[5] = {NUM_LEDS_PER_ROW, 0xFF, 0xFF, 0xFF};
@@ -23,8 +23,8 @@ const int minval[5] = {2, 0, 0, 0};
 
 // Create encoder object
 Encoder enc(2, 3);
-long curEnc = 0;
-long lastCurEnc = 1;
+long curEnc = encval[mode];
+long lastCurEnc = encval[mode] - 1;
 
 // Save last button state
 int lastButtonState = LOW;
@@ -39,6 +39,8 @@ void setup() {
   
   FastLED.addLeds<NEOPIXEL, D_PIN>(leds, NUM_LEDS_PER_ROW*NUM_ROWS);
   FastLED.setBrightness(255);
+
+  enc.write(encval[mode] * 4);
 }
 
 void loop() {
@@ -64,7 +66,7 @@ void loop() {
     enc.write(curEnc * 4);    
   } else if (curEnc < minval[mode]) {
     curEnc = minval[mode];
-    enc.write(curEnc * 4);    
+    enc.write(curEnc * 4);
   }
 
   encval[mode] = curEnc;
@@ -73,7 +75,7 @@ void loop() {
     FastLED.clear();
 
     // Render new state
-    render(encval[M_WIDTH], encval[M_HUE] << 3, encval[M_SAT] << 3, encval[M_VAL] << 3);
+    render(encval[M_WIDTH], encval[M_HUE], encval[M_SAT], encval[M_VAL]);
     FastLED.show();
   }
 
@@ -83,7 +85,7 @@ void loop() {
 void render(int width, byte h, byte s, byte v) {
   CHSV color = CHSV(h, s, v);
   
-  for (int i = 0; i < NUM_ROWS) {
+  for (int i = 0; i < NUM_ROWS; i++) {
     int startindex = i * NUM_LEDS_PER_ROW + (NUM_LEDS_PER_ROW - width) / 2;
     fill_solid(&(leds[startindex]), width, color);
   }
